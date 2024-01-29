@@ -1,1 +1,7 @@
 venv
+.env
+/venv
+.idea
+/__pycache__/
+blueprints/__pycache__/
+repositories/__pycache__/
