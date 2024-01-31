@@ -1,4 +1,4 @@
-from .QuestionTransformer import QuestionTransformer
+from QuestionTransformer import QuestionTransformer
 import requests
 
 

@@ -1,8 +1,8 @@
 # from flask import Flask
 from flask import Blueprint
 
-from . import Categories
-from .OpenTDB import OpenTDB
+import Categories
+from OpenTDB import OpenTDB
 
 # from . import db
 
