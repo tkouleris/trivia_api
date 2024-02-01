@@ -1,6 +1,7 @@
 import os
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 from dotenv import load_dotenv
 
 
@@ -25,8 +26,9 @@ def create_app():
 
 app = create_app()
 
-db = SQLAlchemy()
-
+db = SQLAlchemy(app)
+migrate = Migrate(app, db)
+import models
 init_blueprints()
 
 if __name__ == "__main__":
