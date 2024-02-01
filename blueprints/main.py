@@ -1,10 +1,7 @@
-# from flask import Flask
 from flask import Blueprint
-
 import Categories
 from OpenTDB import OpenTDB
 
-# from . import db
 
 main = Blueprint('main', __name__)
 
