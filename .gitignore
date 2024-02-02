@@ -5,3 +5,5 @@ venv
 /__pycache__/
 blueprints/__pycache__/
 repositories/__pycache__/
+migrations/versions/__pycache__
+migrations/__pycache__
