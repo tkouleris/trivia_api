@@ -28,6 +28,7 @@ app = create_app()
 
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
+
 import models
 init_blueprints()
 
