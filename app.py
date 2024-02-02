@@ -1,8 +1,31 @@
+import functools
 import os
-from flask import Flask
+
+import jwt
+from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from dotenv import load_dotenv
+
+
+def token_required(func):
+    @functools.wraps(func)
+    def decorated(*args, **kwargs):
+        if 'Authorization' not in request.headers.keys():
+            return {'message': 'Missing token'}, 400
+        try:
+            token = request.headers.get('Authorization').replace('Bearer ', '')
+            print(token)
+            payload = jwt.decode(token, app.config['SECRET_KEY'], algorithms='HS256')
+            email = payload['email']
+            print(email)
+            user = models.User.query.filter_by(email=email).first()
+            if not user:
+                return {'message': 'Invalid username'}, 400
+            return func(*args, **kwargs)
+        except:
+            return {'message': 'invalid token'}, 400
+    return decorated
 
 
 def init_blueprints():
@@ -30,6 +53,7 @@ db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
 import models
+
 init_blueprints()
 
 if __name__ == "__main__":

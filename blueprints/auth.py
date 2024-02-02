@@ -1,9 +1,10 @@
+from datetime import timedelta, datetime
 from flask import Blueprint
 from flask import request
 from models import User
-from app import db
+from app import db, app
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import login_user, logout_user, login_required
+import jwt
 
 auth = Blueprint('auth', __name__)
 
@@ -21,7 +22,11 @@ def login():
     user = User.query.filter_by(email=email).first()
     if not user or not check_password_hash(user.password, password):
         return {'status': 0, 'message': 'wrong credentials'}, 401
-    return 'Login'
+
+    token = jwt.encode({'email': user.email, 'expiration': str(datetime.utcnow() + timedelta(minutes=120))},
+                       app.config['SECRET_KEY'], algorithm='HS256'
+                       )
+    return {'token': token}, 200
 
 
 @auth.route('/signup', methods=['POST'])
