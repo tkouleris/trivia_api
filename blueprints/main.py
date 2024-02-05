@@ -13,7 +13,8 @@ main = Blueprint('main', __name__)
 def locked():
     return "Locked"
 
-@main.route("/")
+@main.route("/trivia/general")
+@token_required
 def hello_world():
     opentdb = OpenTDB()
     return opentdb.get("10", Categories.GENERAL_KNOWLEDGE, 'easy')
