@@ -1,8 +1,6 @@
 import functools
 import os
-import time
 import datetime
-
 import jwt
 from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
@@ -23,7 +21,6 @@ def token_required(func):
             expires_timestamp = datetime.datetime.strptime(expires, "%Y-%m-%d %H:%M").timestamp()
             now_timestamp = datetime.datetime.utcnow().timestamp()
             if now_timestamp > expires_timestamp:
-                print('Token expired')
                 return {'message': 'Token expired'}, 400
 
             email = payload['email']
@@ -48,7 +45,6 @@ def init_blueprints():
 
 
 def create_app():
-
     load_dotenv()
     app = Flask(__name__)
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
@@ -61,6 +57,7 @@ app = create_app()
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 import models
+
 init_blueprints()
 
 if __name__ == "__main__":
