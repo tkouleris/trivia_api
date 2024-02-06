@@ -1,3 +1,5 @@
+import datetime
+
 from flask import Blueprint, request
 import Categories
 from OpenTDB import OpenTDB
@@ -40,6 +42,7 @@ def submit_result():
         correct_answers=data['correct_answers'],
         wrong_answers=data['wrong_answers'],
         difficulty=data['difficulty'],
+        created_at=datetime.datetime.utcnow()
     )
     db.session.add(new_round)
     db.session.commit()

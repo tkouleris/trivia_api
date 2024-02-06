@@ -19,3 +19,4 @@ class Round(db.Model):
     correct_answers = db.Column(db.Integer, nullable=False)
     wrong_answers = db.Column(db.Integer, nullable=False)
     difficulty = db.Column(db.String(100), nullable=False)
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
