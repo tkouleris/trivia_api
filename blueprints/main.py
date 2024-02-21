@@ -31,7 +31,7 @@ def get_questions():
 
 
 @main.route("/submit", methods=['POST'])
-# @token_required
+@token_required
 def submit_result():
     data = request.get_json()
     user = get_user()
