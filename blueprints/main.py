@@ -47,3 +47,20 @@ def submit_result():
     db.session.add(new_round)
     db.session.commit()
     return {'status': 0, 'message': 'round saved', "data": data}, 200
+
+
+@main.route("/stats", methods=['GET'])
+@token_required
+def get_stats():
+    user = get_user()
+    rounds = Round.query.filter_by(user_id=user.id).all()
+    stats = {
+        'totals': {"points": 0, "questions": 0, "correct_answers": 0}
+    }
+
+    for round in rounds:
+        stats['totals']['points'] += round.points
+        stats['totals']['questions'] += round.total_questions
+        stats['totals']['correct_answers'] += round.correct_answers
+
+    return {'status': 0, 'data': stats}, 200
