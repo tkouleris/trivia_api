@@ -26,7 +26,7 @@ def login():
     token = jwt.encode({'email': user.email, 'expiration': str(datetime.utcnow() + timedelta(minutes=120))},
                        app.config['SECRET_KEY'], algorithm='HS256'
                        )
-    return {'token': token}, 200
+    return {'token': token, 'username': user.username}, 200
 
 
 @auth.route('/signup', methods=['POST'])

@@ -55,7 +55,8 @@ def get_stats():
     user = get_user()
     rounds = Round.query.filter_by(user_id=user.id).all()
     stats = {
-        'totals': {"points": 0, "questions": 0, "correct_answers": 0}
+        'totals': {"points": 0, "questions": 0, "correct_answers": 0},
+        'leaderboards': []
     }
 
     for round in rounds:
