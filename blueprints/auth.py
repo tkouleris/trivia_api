@@ -1,5 +1,5 @@
 from datetime import timedelta, datetime
-from flask import Blueprint
+from flask import Blueprint, jsonify
 from flask import request
 from models import User
 from app import db, app
@@ -26,7 +26,10 @@ def login():
     token = jwt.encode({'email': user.email, 'expiration': str(datetime.utcnow() + timedelta(minutes=120))},
                        app.config['SECRET_KEY'], algorithm='HS256'
                        )
-    return {'token': token, 'username': user.username}, 200
+    response = jsonify({'token': token, 'username': user.username})
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    return response
+    # return {'token': token, 'username': user.username}, 200
 
 
 @auth.route('/signup', methods=['POST'])
