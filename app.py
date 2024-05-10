@@ -6,7 +6,7 @@ from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from dotenv import load_dotenv
-
+from flask_cors import CORS, cross_origin
 
 def token_required(func):
     @functools.wraps(func)
@@ -54,6 +54,7 @@ def create_app():
 
 
 app = create_app()
+CORS(app)
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 import models
