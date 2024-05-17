@@ -1,6 +1,6 @@
 import datetime
 
-from flask import Blueprint, request
+from flask import Blueprint, request, render_template
 import Categories
 from OpenTDB import OpenTDB
 from app import token_required
@@ -65,3 +65,7 @@ def get_stats():
         stats['totals']['correct_answers'] += round.correct_answers
 
     return {'status': 0, 'data': stats}, 200
+
+@main.route("/", methods=['GET'])
+def index():
+    return render_template('index.html',)
