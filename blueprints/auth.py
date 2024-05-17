@@ -57,6 +57,14 @@ def signup():
     return {'status': 1, 'message': 'User created'}
 
 
-@auth.route('/logout')
-def logout():
-    return 'Logout'
+@auth.route('/refresh', methods=['POST'])
+def refresh():
+    try:
+        token = request.headers.get('Authorization').replace('Bearer ', '')
+        payload = jwt.decode(token, app.config['SECRET_KEY'], algorithms='HS256')
+        token = jwt.encode({'email': payload['email'], 'expiration': str(datetime.utcnow() + timedelta(minutes=120))},
+                           app.config['SECRET_KEY'], algorithm='HS256')
+    except:
+        return {'status': 0, 'message': 'not valid token'}, 400
+
+    return {'status': 1, 'token': token}
