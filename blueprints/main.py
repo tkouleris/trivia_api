@@ -66,6 +66,7 @@ def get_stats():
 
     return {'status': 0, 'data': stats}, 200
 
-@main.route("/", methods=['GET'])
-def index():
-    return render_template('index.html',)
+@main.route('/', defaults={'path': ''})
+@main.route('/<path:path>')
+def serve_react_app(path):
+    return render_template('index.html')
