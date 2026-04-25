@@ -1,11 +1,13 @@
 from datetime import timedelta, datetime
 from flask import Blueprint, jsonify
 from flask import request
+from flask_mail import Message
 from models import User
-from app import db, app, token_required
+from app import db, app, token_required, mail
 from util.helper import get_user
 from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
+import secrets
 
 auth = Blueprint('auth', __name__)
 
@@ -75,3 +77,47 @@ def refresh():
 def verify():
     user = get_user()
     return {'status': 0, 'data': user.username}, 200
+
+
+@auth.route('/request-reset-password', methods=['POST'])
+def request_reset_password():
+    data = request.get_json()
+    if 'email' not in data:
+        return {'status': 0, 'message': 'email missing'}, 400
+
+    email = data['email']
+    user = User.query.filter_by(email=email).first()
+
+    if user:
+        token = secrets.token_urlsafe(32)
+        user.forgot_password_token = token
+        db.session.commit()
+
+        msg = Message("Password Reset Request",
+                      recipients=[email])
+        msg.body = (f"To reset your password, visit the following link: {request.host_url}/confirm-reset-password \r\n "
+                    f"and use this {token} token to reset your password")
+        mail.send(msg)
+
+    return {'status': 1, 'message': 'If the email exists, a password reset link has been sent.'}
+
+@auth.route('/reset-password', methods=['POST'])
+def reset_password():
+    data = request.get_json()
+    if not all(k in data for k in ('email', 'token', 'password')):
+        return {'status': 0, 'message': 'missing fields'}, 400
+
+    email = data['email']
+    token = data['token']
+    password = data['password']
+
+    user = User.query.filter_by(email=email, forgot_password_token=token).first()
+
+    if not user:
+        return {'status': 0, 'message': 'invalid email or token'}, 404
+
+    user.password = generate_password_hash(password, method="scrypt")
+    user.forgot_password_token = None
+    db.session.commit()
+
+    return {'status': 1, 'message': 'Password has been reset successfully.'}

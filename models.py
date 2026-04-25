@@ -8,6 +8,7 @@ class User(db.Model):
     email = db.Column(db.String(100), unique=True)
     username = db.Column(db.String(1000), nullable=False)
     password = db.Column(db.Text(), nullable=False)
+    forgot_password_token = db.Column(db.Text(), nullable=True)
     rounds = db.relationship('Round', backref='user', lazy=True)
 
 

@@ -5,6 +5,7 @@ import jwt
 from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+from flask_mail import Mail, Message
 from dotenv import load_dotenv
 from flask_cors import CORS, cross_origin
 
@@ -50,6 +51,13 @@ def create_app():
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
     app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI')
 
+    app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER')
+    app.config['MAIL_PORT'] = int(os.getenv('MAIL_PORT', 587))
+    app.config['MAIL_USE_TLS'] = os.getenv('MAIL_USE_TLS', 'True') == 'True'
+    app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
+    app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
+    app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_DEFAULT_SENDER')
+
     return app
 
 
@@ -57,6 +65,7 @@ app = create_app()
 CORS(app)
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
+mail = Mail(app)
 import models
 
 init_blueprints()
