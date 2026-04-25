@@ -2,7 +2,8 @@ from datetime import timedelta, datetime
 from flask import Blueprint, jsonify
 from flask import request
 from models import User
-from app import db, app
+from app import db, app, token_required
+from util.helper import get_user
 from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
 
@@ -68,3 +69,9 @@ def refresh():
         return {'status': 0, 'message': 'not valid token'}, 400
 
     return {'status': 1, 'token': token}
+
+@auth.route("/verify", methods=['GET'])
+@token_required
+def verify():
+    user = get_user()
+    return {'status': 0, 'data': user.username}, 200
