@@ -24,7 +24,7 @@ def login():
     if not user or not check_password_hash(user.password, password):
         return {'status': 0, 'message': 'wrong credentials'}, 401
 
-    token = jwt.encode({'email': user.email, 'expiration': str(datetime.utcnow() + timedelta(minutes=120))},
+    token = jwt.encode({'email': user.email, 'expiration': str(datetime.utcnow() + timedelta(minutes=43200))},
                        app.config['SECRET_KEY'], algorithm='HS256'
                        )
     response = jsonify({'token': token, 'username': user.username})
