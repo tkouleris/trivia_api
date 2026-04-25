@@ -95,7 +95,7 @@ def request_reset_password():
 
         msg = Message("Password Reset Request",
                       recipients=[email])
-        msg.body = (f"To reset your password, visit the following link: {request.host_url}/confirm-reset-password \r\n "
+        msg.body = (f"To reset your password, visit the following link: {request.host_url}confirm-reset-password \r\n "
                     f"and use this {token} token to reset your password")
         mail.send(msg)
 
