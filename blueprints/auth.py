@@ -6,6 +6,8 @@ from models import User
 from app import db, app, token_required, mail
 from util.helper import get_user
 from werkzeug.security import generate_password_hash, check_password_hash
+from google.oauth2 import id_token
+from google.auth.transport import requests
 import jwt
 import secrets
 
@@ -121,3 +123,45 @@ def reset_password():
     db.session.commit()
 
     return {'status': 1, 'message': 'Password has been reset successfully.'}
+
+
+@auth.route('/google-login', methods=['POST'])
+def google_login():
+    data = request.get_json()
+    if 'id_token' not in data:
+        return {'status': 0, 'message': 'id_token missing'}, 400
+
+    token = data['id_token']
+    try:
+        # Verify the ID token
+        idinfo = id_token.verify_oauth2_token(token, requests.Request(), app.config['GOOGLE_CLIENT_ID'])
+
+        # ID token is valid. Get the user's Google ID and email.
+        google_id = idinfo['sub']
+        email = idinfo['email']
+        username = idinfo.get('name', email.split('@')[0]) # Fallback to email prefix if name is missing
+
+        # Check if user already exists
+        user = User.query.filter_by(email=email).first()
+
+        if not user:
+            # Create a new user if not exists
+            user = User(email=email, username=username, google_id=google_id)
+            db.session.add(user)
+            db.session.commit()
+        elif not user.google_id:
+            # Link Google account if user exists but doesn't have google_id linked
+            user.google_id = google_id
+            db.session.commit()
+
+        # Generate JWT token
+        token = jwt.encode({'email': user.email, 'expiration': str(datetime.utcnow() + timedelta(minutes=43200))},
+                           app.config['SECRET_KEY'], algorithm='HS256'
+                           )
+        response = jsonify({'token': token, 'username': user.username})
+        response.headers.add("Access-Control-Allow-Origin", "*")
+        return response
+
+    except ValueError:
+        # Invalid token
+        return {'status': 0, 'message': 'Invalid google token'}, 400
